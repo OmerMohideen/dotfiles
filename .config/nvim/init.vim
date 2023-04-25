@@ -12,14 +12,11 @@
 
 call plug#begin(stdpath('data') . '/plugged')
   " Theme "
-  Plug 'dracula/vim'
+  Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 
   " Startup Menu " 
   Plug 'goolord/alpha-nvim'
-
-  " Transparency 
-  Plug 'tribela/vim-transparent'
-  
+ 
   " TypeScript Highlighting "
   Plug 'leafgarland/typescript-vim'
   Plug 'peitalin/vim-jsx-typescript'
@@ -92,6 +89,9 @@ call plug#begin(stdpath('data') . '/plugged')
   " git 
   Plug 'dinhhuy258/git.nvim'
   Plug 'lewis6991/gitsigns.nvim'  
+
+  " golang
+  Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 call plug#end()
 
 " Enable theming support
@@ -101,7 +101,7 @@ endif
 
 " Theme
 syntax enable
-colorscheme dracula
+colorscheme catppuccin-macchiato " catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
 
 let g:transparent_groups = ['Normal', 'Comment', 'Constant', 'Special', 'Identifier',
                             \ 'Statement', 'PreProc', 'Type', 'Underlined', 'Todo', 'String',
@@ -341,11 +341,42 @@ nvim_lsp.intelephense.setup {
 	capabilities = capabilities
 }
 
+nvim_lsp.pyright.setup {
+	on_attach = on_attach,
+	capabilities = capabilities
+}
+
+nvim_lsp.gopls.setup {
+	on_attach = on_attach,
+	capabilities = capabilities,
+	cmd = {"gopls", "serve"},
+	settings = {
+		gopls = {
+			analyses = {
+				unusedparams = true,
+			},
+			staticcheck = true,
+			linksInHover = false,
+			codelenses = {
+				generate = true,
+				gc_details = true,
+				regenerate_cgo = true,
+				tidy = true,
+				upgrade_depdendency = true,
+				vendor = true,
+			},
+			usePlaceholders = true,
+		},
+	},
+}
 -- setup lspsaga
 require("lspsaga").setup ({
-  server_filetype_map = {
-    typescript = 'typescript'
-  }
+ 	ui = {
+        kind = require("catppuccin.groups.integrations.lsp_saga").custom_kind(),
+	},
+  	server_filetype_map = {
+    	typescript = 'typescript'
+  	}
 })
 
 local opts = { noremap = true, silent = true }
@@ -494,7 +525,7 @@ local lualine = require("lualine")
 lualine.setup {
 	options = {
 		icons_enabled = true,
-		theme = 'dracula',
+		theme = 'catppuccin',
 		section_separators = { left = '', right = '' },
 		component_separators = { left = '', right = '' },
 		disabled_filetypes = { "alpha", "nerdtree", "toggleterm" }
